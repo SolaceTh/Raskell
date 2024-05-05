@@ -1,7 +1,12 @@
 import Graphics.Rendering.OpenGL
 import Graphics.UI.GLUT
+import System.Random
+
 
 type Point = (GLfloat, GLfloat)
+type Circle = Float Point
+type Tri = Point Point Point Point
+type Rectangle = Float Float Point
 
 -- Define the corners of the rectangle
 rectangle :: [Point]
