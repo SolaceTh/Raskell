@@ -86,3 +86,8 @@ draw (Circle f p        : shapes) = do
 draw (Fractal s n       : shapes) = do
                                 drawFractal s n
                                 draw shapes
+
+drawFractal :: Shape -> Int -> IO ()
+drawFractal (Triangle p0 p1 p2) = drawTriangleFractal  (Triangle p0 p1 p2)
+drawFractal (Rectanlge f0 f1 p) = drawRectangleFractal (Rectangle f0 f1 p)
+drawFractal s _                 = putStrLn "Cannot create a fractal from" ++ show s
