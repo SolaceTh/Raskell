@@ -1,0 +1,16 @@
+drawFractal :: Rectangle -> Int -> IO ()
+drawFractal rect 0 = drawRectangle rect  -- Base case: draw a single rectangle
+drawFractal (Rectangle width height (x, y)) n = do
+    drawRectangle (Rectangle (width / 2) height (x, y))  -- Draw left half
+    drawRectangle (Rectangle (width / 2) height (x + width / 2, y))  -- Draw right half
+    drawFractal (Rectangle (width / 2) (height / 2) (x, y + height / 2)) (n - 1)  -- Recursively draw top halves
+    drawFractal (Rectangle (width / 2) (height / 2) (x + width / 2, y + height / 2)) (n - 1)  -- Recursively draw bottom halves
+
+displayCanvas :: DisplayCallback
+displayCanvas = do
+    clear [ColorBuffer]
+    -- Draw rectangles
+    drawCircle (Circle 0.5 (0.0, 0.0))
+
+    -- Draw other objects here (points, circles, triangles)
+    swapBuffers
