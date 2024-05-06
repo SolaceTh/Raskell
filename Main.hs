@@ -43,7 +43,7 @@ rect = "[1 2 (0, 2.0)]"
 circ = "[1.0 (0, 1.2)]"
 fract = "[[0.2 0.2 (0.0, 0.0)] 10.0]"
 fractTri = "[[(0.0, 0.0) (0.5, 1.0) (1.0, 0.0)] 10.0]"
-shapeShowcase = "[(0.8, 1.5) (1.4 , 1.65) (1.4, 1.5)] (0.2, 1.5) [0.2 (0.2, 1.5)] [0.2 0.2 (0.5, 1.5)] [(0.0, 1.8) (1.8, 1.8)] [[(1.0, 1.0) (2.0, 2.0) (2.0, 0.0)] 10.0] [[1.0 1.0 (0.0, 0.0)] 10.0]"
+shapeShowcase = "[(0.8, 1.5) (1.4 , 1.65) (1.4, 1.5)] (0.2, 1.5) [0.2 (0.2, 1.5)] [0.2 0.2 (0.5, 1.5)] [(0.0, 1.8) (1.8, 1.8)] [[(1.0, 1.0) (2.0, 2.0) (2.0, 0.0)] 11.0] [[1.0 1.0 (0.0, 0.0)] 11.0]"
 
 parser :: [Token] -> Either [Shape] String
 parser tokens =
@@ -96,7 +96,6 @@ draw (Fractal s n       : shapes) = do
 drawLine :: Point -> Point -> IO ()
 drawLine (x1, y1) (x2, y2) = do
     renderPrimitive Lines $ do
-        color $ Color3 1.0 1.0 (1.0 :: GLfloat)
         vertex $ Vertex2 x1 y1
         vertex $ Vertex2 x2 y2
     
@@ -108,11 +107,16 @@ drawPoint (x, y) = do
       vertex $ Vertex2 x y
 
 drawFractal :: Shape -> Int -> IO ()
-drawFractal (Tri p0 p1 p2) n = drawTriangleFractal  (Tri p0 p1 p2) n
-drawFractal (Rectangle f0 f1 p) n = drawRectangleFractal (Rectangle f0 f1 p) n
+drawFractal (Tri p0 p1 p2) n
+    | n <= 11   = drawTriangleFractal  (Tri p0 p1 p2) n
+    | otherwise = putStrLn "Too large of an n. Will be 2^n operations."
+drawFractal (Rectangle f0 f1 p) n
+    | n <= 11   = drawRectangleFractal (Rectangle f0 f1 p) n
+    | otherwise = putStrLn "Too large of an n. Will be 2^n operations."
 drawFractal s _ = putStrLn $ "Cannot create a fractal from " ++ show s
 
-line :: Point -> Point -> [Point]
+
+line :: Point -> Point -> [Point] -- change
 line (x1, y1) (x2, y2) = line' x1 y1 x2 y2
     where
         line' :: GLfloat -> GLfloat -> GLfloat -> GLfloat -> [Point]
@@ -127,7 +131,7 @@ line (x1, y1) (x2, y2) = line' x1 y1 x2 y2
                     p = 2 * abs(dy) - abs(dx)
                     newY = if p < 0 then y else y + sy
 
-drawCircle :: Shape -> IO ()
+drawCircle :: Shape -> IO () -- circle
 drawCircle (Circle radius center) = do
     let numSegments = 100
         angleIncrement = 2 * pi / fromIntegral numSegments
@@ -144,11 +148,9 @@ drawRectangle (Rectangle width height bottomLeft) = do
     let topLeft = (fst bottomLeft, snd bottomLeft + height)
         topRight = (fst topLeft + width, snd topLeft)
         bottomRight = (fst topRight, snd bottomLeft)
-    color $ Color3 0.0 1.0 (0.0 :: GLfloat)
+    color $ Color3 1.0 0.0 (0.0 :: GLfloat)
     renderPrimitive Lines $ do
-        mapM_ (\(p1, p2) -> do
-            vertex $ Vertex2 (fst p1) (snd p1)
-            vertex $ Vertex2 (fst p2) (snd p2))
+        mapM_ (\(p1, p2) -> drawLine p1 p2)
             [ (bottomLeft, topLeft)
             , (topLeft, topRight)
             , (topRight, bottomRight)
@@ -157,11 +159,9 @@ drawRectangle (Rectangle width height bottomLeft) = do
 
 drawTriangle :: Shape -> IO ()
 drawTriangle (Tri p1 p2 p3) = do
-    color $ Color3 (1.0 :: GLfloat) 0.0 0.0
+    color $ Color3 0.0 (1.0 :: GLfloat) 0.0
     renderPrimitive Lines $ do
-        mapM_ (\(p1, p2) -> do
-            vertex $ Vertex2 (fst p1) (snd p1)
-            vertex $ Vertex2 (fst p2) (snd p2))
+        mapM_ (\(p1', p2') -> drawLine p1' p2')
             [ (p1, p2)
             , (p2, p3)
             , (p3, p1)
@@ -198,6 +198,7 @@ displayCanvas = do
 main :: IO ()
 main = do
     (_progName, _args) <- getArgsAndInitialize
+    initialWindowSize $= Size 3840 2160  -- Set the window size to 4K resolution
     _window <- createWindow "OpenGL Window"
     displayCallback $= displayCanvas
     ortho2D 0 2 0 2
