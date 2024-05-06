@@ -58,7 +58,7 @@ pointHandler = do
     putStrLn "Please input the y value of the point :"
     y <- getLine
     putStrLn "Drawing..."
-    displayCanvas' $ Pnt (x, y)
+    displayCanvas' $ Pnt (read x, read y)
     initCanvas
     repl
 
@@ -73,7 +73,7 @@ lineHandler = do
     putStrLn "Please input the y value of the second point :"
     y1 <- getLine
     putStrLn "Drawing"
-    displayCanvas' $ Line' (x0, y0) (x1, y1)
+    displayCanvas' $ Line' (read x0, read y0) (read x1, read y1)
     initCanvas
     repl
 triHandler :: IO ()
@@ -91,7 +91,7 @@ triHandler = do
     putStrLn "Please input the y value of the third vertex :"
     y2 <- getLine
     putStrLn "Drawing..."
-    displayCanvas' $ Tri (x0, y0) (x1, y1) (z1, z2)
+    displayCanvas' $ Tri (read x0, read y0) (read x1, read y1) (read z1, read z2)
     initCanvas
     repl
 
@@ -106,7 +106,7 @@ rectHandler = do
     putStrLn "Please input the y value of the origin :"
     y <- getLine
     putStrLn "Drawing..."
-    displayCanvas' $ Rectangle l w (x, y)
+    displayCanvas' $ Rectangle (read l) (read w) (read x, read y)
     initCanvas
     repl
 
@@ -119,7 +119,7 @@ circHandler = do
     putStrLn "Please input the y value of the origin :"
     y <- getLine
     putStrLn "Drawing..."
-    displayCanvas' $ Circ r (x, y)
+    displayCanvas' $ Circ (read r) (read x, read y)
     initCanvas
     repl
 
@@ -140,7 +140,7 @@ fractHandler = do
             putStrLn "Please enter the number of reiterations :"
             n <- getLine
             putStrLn "Drawing..."
-            displayCanvas' $ Fractal (Rectangle l w (x, y)) n
+            displayCanvas' $ Fractal (Rectangle (read l) (read w) (read x, read y)) (read n)
             initCanvas
             repl
         "2" -> do
@@ -159,6 +159,6 @@ fractHandler = do
             putStrLn "Please input the number of reiterations :"
             n <- getLine
             putStrLn "Drawing..."
-            displayCanvas' $ Fractal (Triangle (x0, y0) (x1, y1) (x2, y2)) n
+            displayCanvas' $ Fractal (Triangle (read x0, read y0) (read x1, read y1) (read x2, read y2)) (read n)
             initCanvas
             repl
