@@ -222,7 +222,7 @@ repl = do
             displayCanvas inp
             repl
         "2" -> do
-            putStrLn "What would you like to draw?\n1. Point\n2. Line\n3. Triangle\n4. Rectangle\n5. Circle\n6. Fractal\n7. Back\n8. Hypno?"
+            putStrLn "What would you like to draw?\n1. Point\n2. Line\n3. Triangle\n4. Rectangle\n5. Circle\n6. Fractal\n7. Back"
             choice1 <- getLine
             case choice1 of
                 "1" -> pointHandler               
@@ -305,7 +305,7 @@ circHandler = do
 
 fractHandler :: IO ()
 fractHandler = do
-    putStrLn "Please choose a shape with which to construct a fractal :\n1. Triangle\n2. Rectangle"
+    putStrLn "Please choose a shape with which to construct a fractal :\n1. Rectangle\n2. Triangle"
     choice2 <- getLine
     case choice2 of
         "1" -> do
