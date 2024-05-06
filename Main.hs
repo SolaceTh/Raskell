@@ -183,7 +183,7 @@ drawTriangleFractal (Tri p1 p2 p3) n = do
 displayCanvas :: String -> DisplayCallback
 displayCanvas inp = do
     clear [ColorBuffer]
-    case parser (lexer shapeShowcase) of
+    case parser (lexer inp) of
         Left  s -> draw s
         Right e -> putStrLn e
     swapBuffers
@@ -232,8 +232,6 @@ repl = do
                 "5" -> circHandler
                 "6" -> fractHandler
                 "7" -> repl
-                "8" -> hypnoHandler
-
         "3" -> do
             putStrLn "Bye!"
 
