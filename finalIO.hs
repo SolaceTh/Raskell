@@ -11,7 +11,7 @@ data Shape = Pnt Point
            | Rectangle Float Float Point
            | Circle Float Point
            | Fractal Shape Int
-           | HypnoFractal Float Float
+           | HypnoFractal Float Float Int
     deriving (Show, Eq)
 
 data Token = Flt Float
@@ -62,7 +62,7 @@ sr (RBra : PS (Pnt p2) : PS (Pnt p1) : PS (Pnt p0) : LBra : tokens) q = sr (PS  
 sr (RBra : PS (Pnt p)  : Flt f1      : Flt f0      : LBra : tokens) q = sr (PS    (Rectangle f0 f1 p)    : tokens) q
 sr (RBra : PS (Pnt p)  : Flt f                     : LBra : tokens) q = sr (PS       (Circle f p)        : tokens) q
 sr (RBra : Flt f       : PS shape                  : LBra : tokens) q = sr (PS (Fractal shape $ floor f) : tokens) q
-sr (RBra : Flt f1      : Flt f0                    : LBra : tokens) q = sr (PS (HypnoFractal (f0) (f1)) : tokens) q
+sr (RBra : Flt f2      : Flt f1      : Flt f0      : LBra : tokens) q = sr (PS (HypnoFractal f0 f1 (floor f2)) : tokens) q
 
 --Concatination
 sr (PS s1 : PS s0     : tokens) q
@@ -115,19 +115,6 @@ drawFractalLoop startPoint fd ang iter = do
         new_iter = iter - 1.0
     drawLine (x1, y1) (x2, y2)
     drawFractalLoop (x2, y2) new_fd new_angle new_iter
-
-hypnoHandler :: IO ()
-hypnoHandler = do
-    putStrLn "Enter forward distance:"
-    fd <- getLine
-    putStrLn "Enter angle:"
-    ang <- getLine
-    putStrLn "Enter number of iterations:"
-    iter <- getLine
-    putStrLn "Drawing Hypno-Fractal..."
-    drawHypnoFractal (read fd) (read ang) (read iter)
-    repl
-
 
 drawPoint :: Point -> IO ()
 drawPoint (x, y) = do
@@ -353,7 +340,7 @@ circHandler = do
 
 fractHandler :: IO ()
 fractHandler = do
-    putStrLn "Please choose a shape with which to construct a fractal :\n1. Triangle\n2. Rectangle"
+    putStrLn "Please choose a shape with which to construct a fractal :\n1. Triangle\n2. Rectangle\n3. Hypno"
     choice2 <- getLine
     case choice2 of
         "1" -> do
@@ -388,3 +375,13 @@ fractHandler = do
             putStrLn "Drawing..."
             initCanvas $ Right $ Fractal (Tri (read x0, read y0) (read x1, read y1) (read x2, read y2)) (read n)
             displayCanvas' $ Fractal (Tri (read x0, read y0) (read x1, read y1) (read x2, read y2)) (read n)
+        "3" -> do
+            putStrLn "Please input the forward distance :"
+            f <- getLine
+            putStrLn "Please input the angle :"
+            a <- getLine
+            putStrLn "Please input the number of iterations :"
+            n <- getLine
+            putStrLn "Drawing..."
+            initCanvas $ Right $ HypnoFractal (read fd) (read ang) (read iter)
+            displayCanvas' $ HypnoFractal (read fd) (read ang) (read iter)
