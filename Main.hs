@@ -43,7 +43,7 @@ rect = "[1 2 (0, 2.0)]"
 circ = "[1.0 (0, 1.2)]"
 fract = "[[0.2 0.2 (0.0, 0.0)] 10.0]"
 fractTri = "[[(0.0, 0.0) (0.5, 1.0) (1.0, 0.0)] 10.0]"
-shapeShowcase = "(0.2, 1.5) [(0.2, 1.8) (0.5, 2.0)] [[(1.0, 1.0) (2.0, 2.0) (2.0, 0.0)] 10.0] [[1.0 1.0 (0.0, 0.0)] 10.0]"
+shapeShowcase = "[(0.8, 1.5) (1.4 , 1.65) (1.4, 1.5)] (0.2, 1.5) [0.2 (0.2, 1.5)] [0.2 0.2 (0.5, 1.5)] [(0.0, 1.8) (1.8, 1.8)] [[(1.0, 1.0) (2.0, 2.0) (2.0, 0.0)] 10.0] [[1.0 1.0 (0.0, 0.0)] 10.0]"
 
 parser :: [Token] -> Either [Shape] String
 parser tokens =
@@ -75,33 +75,37 @@ sr tokens          [] = tokens
 draw :: [Shape] -> IO ()
 draw [] = putStrLn "Finished"
 draw (Pnt p      : shapes) = do
-                        drawPoint p
-                        draw shapes
+    drawPoint p
+    draw shapes
 draw (Line' p0 p1 : shapes) = do
-                        drawLine p0 p1
-                        draw shapes
+    drawLine p0 p1
+    draw shapes
 draw (Tri p0 p1 p2 : shapes) = do
-                                drawTriangle  (Tri p0 p1 p2)
-                                draw shapes
+    drawTriangle (Tri p0 p1 p2)
+    draw shapes
 draw (Rectangle f0 f1 p : shapes) = do
-                                drawRectangle (Rectangle f0 f1 p)
-                                draw shapes
+    drawRectangle (Rectangle f0 f1 p)
+    draw shapes
 draw (Circle f p        : shapes) = do
-                                drawCircle (Circle f p)
-                                draw shapes
+    drawCircle (Circle f p)
+    draw shapes
 draw (Fractal s n       : shapes) = do
-                                drawFractal s n
-                                draw shapes
+    drawFractal s n
+    draw shapes
 
 drawLine :: Point -> Point -> IO ()
 drawLine (x1, y1) (x2, y2) = do
     renderPrimitive Lines $ do
+        color $ Color3 1.0 1.0 (1.0 :: GLfloat)
         vertex $ Vertex2 x1 y1
         vertex $ Vertex2 x2 y2
     
 drawPoint :: Point -> IO ()
 drawPoint (x, y) = do
-    renderPrimitive Points $ vertex $ Vertex2 x y
+    renderPrimitive Points $ do
+      color $ Color3 1.0 1.0 (1.0 :: GLfloat)
+
+      vertex $ Vertex2 x y
 
 drawFractal :: Shape -> Int -> IO ()
 drawFractal (Tri p0 p1 p2) n = drawTriangleFractal  (Tri p0 p1 p2) n
@@ -129,6 +133,7 @@ drawCircle (Circle radius center) = do
         angleIncrement = 2 * pi / fromIntegral numSegments
         points = [(centerX + radius * cos (angleIncrement * fromIntegral i), centerY + radius * sin (angleIncrement * fromIntegral i)) | i <- [0..numSegments]]
         (centerX, centerY) = center
+    color $ Color3 0.0 0.0 (1.0 :: GLfloat)
     renderPrimitive Lines $ do
         mapM_ (\(p1, p2) -> do
             vertex $ Vertex2 (fst p1) (snd p1)
@@ -139,6 +144,7 @@ drawRectangle (Rectangle width height bottomLeft) = do
     let topLeft = (fst bottomLeft, snd bottomLeft + height)
         topRight = (fst topLeft + width, snd topLeft)
         bottomRight = (fst topRight, snd bottomLeft)
+    color $ Color3 0.0 1.0 (0.0 :: GLfloat)
     renderPrimitive Lines $ do
         mapM_ (\(p1, p2) -> do
             vertex $ Vertex2 (fst p1) (snd p1)
@@ -151,6 +157,7 @@ drawRectangle (Rectangle width height bottomLeft) = do
 
 drawTriangle :: Shape -> IO ()
 drawTriangle (Tri p1 p2 p3) = do
+    color $ Color3 (1.0 :: GLfloat) 0.0 0.0
     renderPrimitive Lines $ do
         mapM_ (\(p1, p2) -> do
             vertex $ Vertex2 (fst p1) (snd p1)
@@ -194,5 +201,4 @@ main = do
     _window <- createWindow "OpenGL Window"
     displayCallback $= displayCanvas
     ortho2D 0 2 0 2
-
     mainLoop
